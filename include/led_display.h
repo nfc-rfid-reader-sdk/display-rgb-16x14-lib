@@ -1,10 +1,10 @@
 /*
  * led_display.h
  *
- *  Version: 2.0.0
+ *  Version: 2.1
  *
  *  Created on: 01.11.2012.
- *      Author: srkos
+ *      Author: Digital Logic, www.d-logic.net
  */
 
 #ifndef LED_DISPLAY_H_
@@ -106,8 +106,6 @@ typedef enum E_ERROR_CODES
 //#############################################################################
 
 #include <stdint.h>
-#include <stddef.h>
-#include <time.h>
 
 typedef const char * c_string;
 
@@ -157,6 +155,16 @@ DL_API
 DL_STATUS DL_GetDisplayVersion(int display_id, uint32_t * version);
 
 DL_API
+DL_STATUS DL_GetDisplayFirmwareVersion(int display_id, int *fw_version, int *hw_version);
+
+/**
+ *
+ * @param display_id
+ * @param strSN already reserved char array with minimum 9 characters length
+ * @param intID
+ * @return
+ */
+DL_API
 DL_STATUS DL_GetDisplaySerial(int display_id, char *strSN, int *intID);
 
 //#############################################################################
@@ -180,6 +188,11 @@ DL_API
 DL_STATUS DL_DisplaySendConfig(int display_id, int number_of_panels, int font, int brightness,
 		int scroll_start_ms, int scroll_speed_ms, int screen_display_time);
 
+DL_API
+DL_STATUS DL_DisplaySendConfigRGB(int display_id, int number_of_panels, int number_of_rows,
+		int font, int brightness, int scroll_start_ms, int scroll_speed_ms, int screen_display_time,
+		int red, int green, int blue);
+
 //-----------------------------------------------------------------------------
 DL_API
 DL_STATUS DL_DisplaySendText(int display_id, char * chDisplayText, int DisplayText_Len);
@@ -194,7 +207,7 @@ DL_STATUS DL_DisplaySendText(int display_id, char * chDisplayText, int DisplayTe
  * (first text_buffer_size must be initialized with size of the available text_buffer bytes)
  */
 DL_API
-DL_STATUS DL_Insert_DateTimeFormated(char *text_buffer, int *text_buffer_size, time_t timestamp,
+DL_STATUS DL_Insert_DateTimeFormated(char *text_buffer, int *text_buffer_size, uint32_t timestamp,
 		int datetime_format);
 
 DL_API
@@ -223,8 +236,8 @@ DL_STATUS DL_DisplaySetDefault(
 DL_API
 DL_STATUS DL_DisplaySetDefaultRgb(
 		int display_id, //
-		int number_of_panels, int number_of_rows, int font, int brightness, int scroll_start_ms, int scroll_speed_ms,
-		int screen_display_time, //
+		int number_of_panels, int number_of_rows, int font, int brightness, int scroll_start_ms,
+		int scroll_speed_ms, int screen_display_time, //
 		char *strDefaultMsg, int DefaultMsg_Len, int red, int green, int blue);
 
 //-----------------------------------------------------------------------------
@@ -242,101 +255,14 @@ DL_STATUS DL_DisplayCommon(int display_id, int number_of_panels, int font, int b
 		int Line1Display_Len);
 
 DL_API
-DL_STATUS DL_DisplayCommonRgb(int display_id, int number_of_panels, int number_of_rows, int font, int brightness,
-		int scroll_start_ms, int scroll_speed_ms, int screen_display_time, char * chLine1Display,
-		int Line1Display_Len, int red, int green, int blue);
+DL_STATUS DL_DisplayCommonRgb(int display_id, int number_of_panels, int number_of_rows, int font,
+		int brightness, int scroll_start_ms, int scroll_speed_ms, int screen_display_time,
+		char * chLine1Display, int Line1Display_Len, int red, int green, int blue);
 
 //#############################################################################
-//#############################################################################
-//#############################################################################
-//#############################################################################
-//#############################################################################
-// private
-// not documented functions
-//#############################################################################
-#define CONFIG_TABLE_COLS	14
-
-typedef union U_config_row
-{
-	int cell[CONFIG_TABLE_COLS];
-	struct
-	{
-		long num;
-		long display_id;
-		long panel_x;
-		long panel_y;
-		long pix_x;
-		long pix_y;
-		long brightness;
-		long font;
-		long scroll_start;
-		long scroll_speed;
-		long screen_display_time;
-          long rgb[3];
-	};
-} t_config_row;
-
-typedef union U_VERSION
-{
-	uint32_t val;
-	unsigned short w[2];
-	unsigned char v[4];
-	struct
-	{
-		uint32_t major :8;
-		uint32_t minor :8;
-		uint32_t release :8;
-		uint32_t build :8;
-	};
-	struct
-	{
-		uint32_t fw_ver :16;
-		uint32_t hw_ver :8;
-		uint32_t hw_type :8;
-	};
-} t_version;
-//#############################################################################
-// undocumented, functions with structures
-// send display settings
-DL_API
-DL_STATUS DL_DisplaySendConfigStruct(int device_id, void * display_config);
-// send display data
-DL_API
-DL_STATUS DL_DisplaySendData(int device_id, void * display_config, char * chDisplayText,
-		int DisplayText_Len);
-//#############################################################################
-
-//#############################################################################
-// FIXME: tempirana bomba za vise displeja na magistrali
-DL_API
-DL_STATUS DL_DisplayInitSN(int display_id, char * new_sn, int new_id);
-
-//#############################################################################
-DL_API
-DL_STATUS DL_DisplayFlashFirmwareBOOT_Init(int device_id, void * firmware_data, int firmware_size);
 
 DL_API
-DL_STATUS DL_DisplayFlashFirmware_Init(int device_id, void * firmware_data, int firmware_size);
-
-DL_API
-DL_STATUS DL_DisplayTransferData_DoEvent(void);
-
-DL_API
-int DL_DisplayTransferData_GetPercent(void);
-//#############################################################################
-DL_API
-DL_STATUS DL_DisplayFlashFirmwareFromFile(const char * bin_path_name);
-
-DL_API
-DL_STATUS DL_DisplayFlashFirmware(int device_id, void * firmware_data, int firmware_size);
-DL_API
-DL_STATUS DL_DisplayFlashFirmwareBOOT(int device_id, void * firmware_data, int firmware_size);
-
-DL_API
-c_string DL_Debug_ErrorStr(DL_STATUS DL_status);
-
-DL_API
-DL_STATUS DL_TestMain(void * in_param);
+c_string DL_STATUS2Str(DL_STATUS status);
 
 #ifdef __cplusplus
 }
