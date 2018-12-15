@@ -158,11 +158,7 @@ DL_API
 DL_STATUS DL_GetDisplayFirmwareVersion(int display_id, int *fw_version, int *hw_version);
 
 /**
- *
- * @param display_id
  * @param strSN already reserved char array with minimum 9 characters length
- * @param intID
- * @return
  */
 DL_API
 DL_STATUS DL_GetDisplaySerial(int display_id, char *strSN, int *intID);
